@@ -1,0 +1,146 @@
+{
+  "name": "UCIPS_workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/client-intake",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8b307b53-4b5a-4a49-aa57-de6e32f91369",
+      "name": "Webhook",
+      "webhookId": "a0e38fb1-7946-4354-b9a7-4f7482281637"
+    },
+    {
+      "parameters": {
+        "listId": "69b2cd386381d6fbb7ec4dda",
+        "name": "={{ $json.body.clientName }}\n",
+        "description": "=Client: {{ $json.body.clientName }}\n\nEmail: {{ $json.body.email }}\n\nEpic: EPIC-01 - Client Onboarding & Profile Management\nStakeholder: Priya Kapoor (Sales Admin)",
+        "additionalFields": {
+          "pos": "top",
+          "idLabels": "69b2cd392dc1c30a45632354"
+        }
+      },
+      "type": "n8n-nodes-base.trello",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "8617416c-2876-4cd4-88c3-bfc3eb99251d",
+      "name": "Create a card",
+      "credentials": {
+        "trelloApi": {
+          "id": "T0GykvBEYsiC5xz0",
+          "name": "Trello account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "marketentryagent@gmail.com",
+        "subject": "=New Client Intake Received - {{ $('Webhook').first().json.body.clientName }}\n",
+        "message": "=A new client intake has been submitted.\n\nClient: {{ $('Webhook').first().json.body.clientName }}\nCompany: {{ $('Webhook').first().json.body.company }}\nEmail: {{ $('Webhook').first().json.body.email }}\n\nA Trello card has been created automatically.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "c17f0f5f-5dc7-45f4-8263-a94c40dd5209",
+      "name": "Send a message",
+      "webhookId": "dc26d8da-6d21-41fe-bdfc-e030d8b98058",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "hdu6ds5LoNYBotWI",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "test_channel",
+          "mode": "name"
+        },
+        "text": "=New client intake received!\nClient: {{ $('Webhook').first().json.body.clientName }}\nCompany: {{ $('Webhook').first().json.body.company }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        624,
+        0
+      ],
+      "id": "50d23e64-2737-41c6-a278-3d259dac94bf",
+      "name": "Send a message1",
+      "webhookId": "b3262db0-30b2-4b29-b953-cb0f91687de6",
+      "credentials": {
+        "slackApi": {
+          "id": "A0S0F4Q5U5bTcG4T",
+          "name": "Slack account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Create a card",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a card": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "d01485b0-2a43-4923-b8c9-e6b61d5d5491",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "79eebee180a67a0af5c917ccb65b3d75a4f499141952257ea26d5cc7df5ab0c3"
+  },
+  "id": "VUvaLtYvGsZ08aeF",
+  "tags": []
+}
